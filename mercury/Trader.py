@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 import pandas as pd
 
-from . import Product, Strategy, Position, Signal, State
+from . import Product, Strategy, Position, Signal, State, Results
 from .common import time_interval
 
 #TODO move into Product
@@ -63,7 +63,8 @@ class Trader:
         # FIXME not implemented
         return True
 
-    def __tradesim(self, product_slices: Sequence[Product], trade_interval: time_interval) -> Sequence[State]:
+    def __tradesim(self, product_slices: Sequence[Product], trade_interval: time_interval,
+                     cash : float) -> Sequence[State]:
         """__tradesim.
         Run trading simulation during across given product slices
 
@@ -76,7 +77,7 @@ class Trader:
 
         product_slices = product_slices.slice(time_interval)
         # Create states for each day
-        state_sequence = [State.State(product_slices)]*product_slices.dsize
+        state_sequence = [State(product_slices, cash)]*product_slices.dsize
 
         '''
         It goes like this:
@@ -100,22 +101,23 @@ class Trader:
 
     # Is it better called an "interval" or a "range"?
 
-    def run(self, test_interval : time_interval = None, train_interval : time_interval = None):
+    def run(self, test_interval : time_interval = None, train_interval : time_interval = None, cash : float = 10000):
         # train on given interval (if None just does it on the whole data)
         # then test on given interval (if None just does it on the whole data)
         # TODO it would be better to train on all the data available before the test period if no train_interval is passed
         self.__train_slices = self.strategy.train(self.data.slice(train_interval))
-        self.train_results = self.__tradesim(self.__train_slices, train_interval)
+        self.train_results = self.__tradesim(self.__train_slices, train_interval, cash)
 
         self.__testing_set = self.__test_slicer(self.__train_slices, self.data, test_interval)
 
-        self.test_results = self.__tradesim(self.__testing_set, test_interval)
+        self.test_results = self.__tradesim(self.__testing_set, test_interval, cash)
 
-        #self.
+        self.results = Results.Results(self.train_results, self.test_results)
+        s_results = self.strategy.metrics(self.results)
 
-    @property
-    def results(self):
-        return self.test_results
+    def print_results(self):
+        print(self.results)
+
 
     def load_data(self, path: str):
         """load_data.

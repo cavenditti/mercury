@@ -1,6 +1,6 @@
 from collections.abc import Mapping, Sequence
 
-from . import Product,Position,Signal
+from . import Product,Position,Signal,Results
 
 class Strategy:
     """Strategy."""
@@ -51,3 +51,16 @@ class Strategy:
         :rtype: Mapping[Product, Signal]
         """
         raise NotImplementedError("Strategy classes must implement a planner function")
+
+    def metrics(self, results : Results) -> Results:
+        """metrics.
+        TODO
+
+        results['metric_name'] = 'Metric Pretty Name', metric_value
+
+        :param results:
+        :type results: Results
+        :rtype: Results
+        """
+        return results
+

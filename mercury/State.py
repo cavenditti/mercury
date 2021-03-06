@@ -7,7 +7,7 @@ from mercury.Signal import Signal
 class State(Mapping[Product,(Position, Signal)]):
     """State."""
 
-    def __init__(self, source=None, cash : float =None):
+    def __init__(self, source=None, cash : float = 0):
         """__init__.
 
         :param source:
@@ -71,6 +71,11 @@ class State(Mapping[Product,(Position, Signal)]):
         :returns: Total value of available cash and open positions
         :rtype: float
         """
+
         total_value = self.cash
         for position,signal in self.map.values():
-            total_value += position.value
+            try:
+                total_value += position.value
+            except AttributeError:
+                pass
+        return total_value
