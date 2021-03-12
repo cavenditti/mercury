@@ -23,11 +23,13 @@ class time_interval:
         else:
             self.end = ending
 
-    def days_between(self):
+    def days_between(self) -> str:
         return days_between(self.start,self.end)
 
-    def months_between(self):
+    def months_between(self) -> str:
         return months_between(self.start,self.end)
+
+    #def years(
 
     def duration(self):
         return timedelta(self.start, self.end)

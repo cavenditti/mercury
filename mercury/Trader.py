@@ -4,8 +4,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 import pandas as pd
 
-from . import Product, Strategy, Position, Signal, State, Results
-from .common import time_interval
+from .Product  import Product
+from .Strategy import Strategy
+from .Position import Position
+from .Signal   import Signal
+from .State    import State
+from .Results  import Results
+from .common   import time_interval
 
 #TODO move into Product
 #TODO ensure the index is the same for all products (make this a DataFrame?)
@@ -112,7 +117,7 @@ class Trader:
 
         self.test_results = self.__tradesim(self.__testing_set, test_interval, cash)
 
-        self.results = Results.Results(self.train_results, self.test_results)
+        self.results = Results(self.train_results, self.test_results)
         s_results = self.strategy.metrics(self.results)
 
     def print_results(self):

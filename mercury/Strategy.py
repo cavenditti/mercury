@@ -1,6 +1,9 @@
 from collections.abc import Mapping, Sequence
 
-from . import Product,Position,Signal,Results
+from .Product  import Product
+from .Position import Position
+from .Signal   import Signal
+from .Results  import Results
 
 class Strategy:
     """Strategy."""

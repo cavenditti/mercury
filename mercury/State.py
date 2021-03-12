@@ -1,8 +1,8 @@
 from collections.abc import Sequence,Mapping
 
-from mercury.Product import Product
-from mercury.Position import Position
-from mercury.Signal import Signal
+from .Product  import Product
+from .Position import Position
+from .Signal   import Signal
 
 class State(Mapping[Product,(Position, Signal)]):
     """State."""
