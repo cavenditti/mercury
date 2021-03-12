@@ -144,7 +144,7 @@ class Trader:
         df = pd.read_csv(path, index_col='date')
         self.data = Data()
         for column in df.columns:
-            df[column].name = 'Close'
-            self.data.append(Product(column, 'stock', data={'Close' : df[column]}))
+            df[column].name = 'close'
+            self.data.append(Product(column, 'stock', data={'close' : df[column]}))
 
 
