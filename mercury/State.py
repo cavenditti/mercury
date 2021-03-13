@@ -50,7 +50,7 @@ class State(Mapping[Product,(Position, Signal)]):
         """
 
         # If we're opening or closing a position the readly available cash changes
-        if signal.type != Signal.keep and position is not None:
+        if signal.type != Signal.Keep and position is not None:
             self.cash = self.cash + self.map[product.ISIN][0].value - position.value
 
         self.map[product.ISIN] = (position, signal)

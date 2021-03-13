@@ -7,7 +7,7 @@ from mercury import Signal
 
 class dummy_strategy(Strategy):
     def __init__(self):
-        self.keep = Signal(Signal.keep)
+        self.keep = Signal.keep()
 
     def play(self, position, product_slice):
         return self.keep

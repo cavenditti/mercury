@@ -6,33 +6,30 @@ from .common import HollowType
 class PositionType(metaclass=HollowType):
     pass
 
-class Short(PositionType):
-    pass
-
-class Long(PositionType):
-    pass
-
-class Closed(PositionType):
-    pass
-
 class PositionMetaclass(type):
-    @property
-    def short(cls):
-        return Short
-    @property
-    def long(cls):
-        return Long
-    @property
-    def none(cls):
-        return Closed
+    def short(cls, product: Product, instant: datetime, quantity: int):
+        return Position(product, instant, quantity, Position.Short)
+    def long(cls, product: Product, instant: datetime, quantity: int):
+        return Position(product, instant, quantity, Position.Long)
+    def none(cls, product: Product, instant: datetime, quantity: int):
+        return Position(product, instant, quantity, Position.Closed)
 
 class Position(metaclass=PositionMetaclass):
     """Position.
     Possible types of position:
-    - None
+    - Closed
     - Short
     - Long
     """
+
+    class Short(PositionType):
+        pass
+
+    class Long(PositionType):
+        pass
+
+    class Closed(PositionType):
+        pass
 
     def __init__(self, product: Product, instant: datetime, quantity: int, positionType: PositionType):
         self.type          = positionType
