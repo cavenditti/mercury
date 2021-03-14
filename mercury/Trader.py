@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import pandas as pd
+import logging as log
 
 from .Product  import Product
 from .Strategy import Strategy
@@ -22,11 +23,11 @@ class Data(list):
         return new_list
 
     @property
-    def dindex(self):
+    def index(self):
         return self[0].index
 
     @property
-    def dsize(self):
+    def size(self):
         return self[0].index.size
 
     @property
@@ -39,6 +40,8 @@ class Trader:
 
     def __init__(self, strategy: Strategy):
         self.strategy = strategy
+        log.basicConfig(filename='mercury.log', level=log.DEBUG)
+        log.info(f'Created Strategy {strategy.__class__.__name__}')
 
     @staticmethod
     def __test_slicer(train_slices: Sequence[Product], data, test_interval) -> Sequence[Product]:
@@ -81,8 +84,8 @@ class Trader:
         """
 
         product_slices = product_slices.slice(time_interval)
-        # Create states for each day
-        state_sequence = [State(product_slices, cash)]*product_slices.dsize
+        # Create state for first period
+        state_sequence = [State(product_slices, cash)]
 
         '''
         It goes like this:
@@ -92,15 +95,34 @@ class Trader:
                 self.strategy.play()
             self.strategy.planner()
         '''
-        # We use int indeces from index so we easly get prevoius and next when needed
-        for i in range(product_slices.dsize-1):
+        # keep first period
+        first_dpos = product_slices.index[0]
+        log.debug(f'STARTING SIMULATION AT {first_dpos}\n')
+        # We use int indeces from index so we easly get previous and next when needed
+        for i in range(product_slices.size-1):
+            dpos = product_slices.index[i] # current day
+            log.debug(f'<{dpos}>')
+            log.debug(f'<{dpos}> Value: {state_sequence[i].cash} cash')
             for product in product_slices:
-                position = state_sequence[i].position(product)
-                signal = self.strategy.play(position,product)
+                pos = state_sequence[i].position(product)
+                if pos.is_open:
+                    log.debug(f'<{dpos}> Value: {pos.value} in {product.ISIN}')
 
-                state_sequence[i].update(product, position, signal)
+            # create new state in sequence
+            state_sequence.append(state_sequence[i].new())
 
-            state_sequence[i+1] = self.strategy.planner(state_sequence[i])
+            for product in product_slices:
+                position = state_sequence[i].position(product).copy()
+                position.update_price(product.close[dpos]) # update current price first
+                state_sequence[i].update_position(product, position)
+                signal = self.strategy.play(position,product.dslice(first_dpos, dpos))
+
+                state_sequence[i+1].update(product, position, signal)
+                log.debug('<{}> | {:*^12} : {:<40} -> {:^12}'.format(dpos,product.ISIN,str(position),str(signal)))
+
+            state_sequence[i+1] = self.strategy.planner(state_sequence[i+1],dpos)
+
+            log.debug('')
 
         return state_sequence
 
@@ -133,7 +155,7 @@ class Trader:
         #self.data = data?
         raise NotImplementedError
 
-    def import_data(self, path: str):
+    def import_data(self, path: str, columns=[]):
         """import_data.
         import old data from CSVs with only closing prices
 
@@ -143,8 +165,11 @@ class Trader:
 
         df = pd.read_csv(path, index_col='date')
         self.data = Data()
+        print(df.columns)
         for column in df.columns:
-            df[column].name = 'Close'
-            self.data.append(Product(column, 'stock', data={'Close' : df[column]}))
+            if columns and column not in columns:
+                continue
+            df[column].name = 'close'
+            self.data.append(Product(column, 'stock', data={'close' : df[column]}))
 
 

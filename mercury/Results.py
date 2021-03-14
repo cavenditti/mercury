@@ -7,7 +7,7 @@ class Results:
         self.__dict__['value'] = None, value
         self.__dict__['starting_value'] = 'Starting value:', value[0]
         self.__dict__['final_value'] = 'Final value:', value[-1]
-        self.__dict__['p_l'] = 'P&L:', (value[-1]/value[0]-1)*100, '%'
+        self.__dict__['p_l'] = 'P&L:', round((value[-1]/value[0]-1)*100,2), '%'
         self.__dict__['dd'] = 'Maximum Drawdown:', self.calculate_dd(value)
 
     def calculate_dd(self, values):

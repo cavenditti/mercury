@@ -1,5 +1,7 @@
 from collections.abc import Mapping, Sequence
+from datetime import datetime
 
+from .State    import State
 from .Product  import Product
 from .Position import Position
 from .Signal   import Signal
@@ -46,7 +48,7 @@ class Strategy:
         """
         raise NotImplementedError("Strategy classes must implement a play function")
 
-    def planner(self, state: Mapping[Product,(Position,Signal)]) -> Mapping[Product, Signal]:
+    def planner(self, state: State, date : datetime) -> State:
         """planner.
 
         :param state:

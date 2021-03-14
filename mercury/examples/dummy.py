@@ -7,12 +7,12 @@ from mercury import Signal
 
 class dummy_strategy(Strategy):
     def __init__(self):
-        self.keep = Signal.keep()
+        pass
 
     def play(self, position, product_slice):
-        return self.keep
+        return Signal.keep()
 
-    def planner(self, state):
+    def planner(self, state, date):
         return state
 
 if __name__ == "__main__":

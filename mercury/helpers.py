@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime
 import time
 import sys
+import operator
 
 def safe_filename(string):
     keepcharacters = (' ','.','_')
@@ -32,4 +33,14 @@ def years_between(d1, d2) -> float:
 
 def print_date_interval(d1, d2):
     print('[', d1.strftime('%Y-%m-%d'), d2.strftime('%Y-%m-%d'), '->', duration_str(d1,d2), ']')
+
+ops = {
+        '>': operator.gt,
+        '<': operator.lt,
+        '>=': operator.ge,
+        '<=': operator.le,
+        '==': operator.eq,
+        '!=': operator.ne
+    }
+
 
