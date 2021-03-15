@@ -24,40 +24,68 @@ class time_interval:
             self.end = ending
 
     def days_between(self):
-        return days_between(self.start,self.end)
+       """
+       >>> d1 = datetime.strptime('2021-03-01', '%Y-%m-%d')
+       >>> d2 = datetime.strptime('2021-05-16', '%Y-%m-%d')
+       >>> ti = time_interval(d1, d2)
+       >>> time_interval.days_between(ti)
+       76
+       """
+       return days_between(self.start,self.end)
 
     def months_between(self):
-        return months_between(self.start,self.end)
+       """
+       >>> d1 = datetime.strptime('2021-03-01', '%Y-%m-%d')
+       >>> d2 = datetime.strptime('2021-05-16', '%Y-%m-%d')
+       >>> ti = time_interval(d1, d2)
+       >>> time_interval.months_between(ti)
+       3
+       """
+       return months_between(self.start,self.end)
 
     def duration(self):
-        return timedelta(self.start, self.end)
-
-
-# from https://github.com/mmcloughlin/luhn
-def luhn_checksum(numeric_string):
-    """
-    Compute the Luhn checksum for the provided string of digits. Note this
-    assumes the check digit is in place.
-    """
-    digits = list(map(int, numeric_string))
-    odd_sum = sum(digits[-1::-2])
-    even_sum = sum([sum(divmod(2 * d, 10)) for d in digits[-2::-2]])
-    return (odd_sum + even_sum) % 10
+       """
+       >>> d1 = datetime.strptime('2021-03-01', '%Y-%m-%d')
+       >>> d2 = datetime.strptime('2021-05-16', '%Y-%m-%d')
+       >>> ti = time_interval(d1, d2)
+       >>> time_interval.duration(ti)
+       datetime.timedelta(days=76)
+       """
+       return (self.end - self.start)
 
 class ISIN(str):
     def check(self):
         """
         Check if the provided string is a valid ISIN.
+        >>> ISIN.check('US02376R1023')
+        True
+        >>> ISIN.check('AAL')
+        False
         """
+        # from https://github.com/mmcloughlin/luhn
+        def luhn_checksum(numeric_string : str) -> int:
+            """
+            Compute the Luhn checksum for the provided string of digits. Note this
+            assumes the check digit is in place.
+            """
+            digits = list(map(int, numeric_string))
+            odd_sum = sum(digits[-1::-2])
+            even_sum = sum([sum(divmod(2 * d, 10)) for d in digits[-2::-2]])
+            return (odd_sum + even_sum) % 10
+
         if len(self) != 12:
+            return False
+        if not self[-1].isdigit():
             return False
 
         numeric_isin = ''
-        numeric_isin += string.ascii_letters.index(self[0])%26 + 10
-        numeric_isin += string.ascii_letters.index(self[1])%26 + 10
-        numeric_isin += self[2:]
+        for c in range(len(self)):
+            if self[c].isdigit():
+                numeric_isin += self[c]
+            else:
+                numeric_isin += str(string.ascii_letters.index(self[c])%26 + 10)
 
-        return (checksum(numeric_isin) == 0)
+        return (luhn_checksum(numeric_isin) == 0)
 
 '''
 --------------------------------------------------------------------------------
@@ -111,3 +139,7 @@ class T_Counter:
             sys.stdout.write("\r"+'{}: Done in {}s\n'.format(T_Counter.__instance__.message, elapsed))
             sys.stdout.flush()
             T_Counter.__instance__ = None
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
