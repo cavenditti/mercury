@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 import pandas as pd
 import logging as log
+from pympler.asizeof import asizeof
 
 from .Product  import Product
 from .Strategy import Strategy
@@ -87,6 +88,12 @@ class Trader:
         # Create state for first period
         state_sequence = [State(product_slices, cash)]
 
+        log.debug(f'Data size: {asizeof(self.data)}\n')
+        log.debug(f'State size: {asizeof(state_sequence[0])}\n')
+
+        print(f'Data size: {asizeof(self.data)}\n')
+        print(f'State size: {asizeof(state_sequence[0])}\n')
+
         '''
         It goes like this:
 
@@ -121,6 +128,8 @@ class Trader:
                 log.debug('<{}> | {:*^12} : {:<40} -> {:^12}'.format(dpos,product.ISIN,str(position),str(signal)))
 
             state_sequence[i+1] = self.strategy.planner(state_sequence[i+1],dpos)
+
+            print(f'State size: {round(asizeof(state_sequence[i+1])/(1024*1024))}M\n')
 
             log.debug('')
 

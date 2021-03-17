@@ -43,13 +43,25 @@ class SMA(Strategy):
         pos_value = 0
         if n != 0:
             pos_value = state.cash / 2 * n
+            if pos_value == float('-inf') or pos_value == float('inf'):
+                return state
         for p in state:
             sig_type = state.signal(p).type
             if sig_type == Signal.Open_long:
-                quantity = round(pos_value / p.close.loc[date])
+                try:
+                    quantity = round(pos_value / p.close.loc[date])
+                except Exception as e:
+                    print('Ahia', p.ISIN, e.__class__.__name__, e)
+                    print(f'pos_value: {pos_value}')
+                    print(f'p.close.loc[date]: {p.close.loc[date]}')
+                    quantity = 0
                 state.update_position(p, Position.long(p, date, quantity))
             elif sig_type == Signal.Open_short:
-                quantity = round(pos_value / p.close.loc[date])
+                try:
+                    quantity = round(pos_value / p.close.loc[date])
+                except Exception as e:
+                    print('Ahia', p.ISIN, e.__class__.__name__, e)
+                    quantity = 0
                 state.update_position(p, Position.short(p, date, quantity))
             elif sig_type == Signal.Close:
                 state.update_position(p, Position.closed(p, date))
@@ -60,6 +72,6 @@ if __name__ == "__main__":
     from mercury import Trader
     sma_strategy = SMA()
     trader = Trader(sma_strategy)
-    trader.import_data('../../data/synthetic/sintetici2k.csv', columns=['rnd0', 'rnd1'])
+    trader.import_data('../../data/synthetic/sintetici2k.csv')
     trader.run()
     trader.print_results()

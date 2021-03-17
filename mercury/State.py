@@ -51,7 +51,7 @@ class State(Mapping[Product,(Position, Signal)]):
     def new(self):
         return State(self)
 
-    def update(self, product: Product, position: Position, signal: Signal):
+    def update(self, product: Product, position: Position, signal: Signal) -> bool:
         """update.
 
         :param product:
@@ -62,17 +62,24 @@ class State(Mapping[Product,(Position, Signal)]):
         :type signal: Signal
         """
 
+        if self.enough_cash(position):
+            return False
+
         # If we're opening or closing a position the readly available cash changes
         if signal.type != Signal.Keep and position is not None:
             self.cash = round(self.cash + self.map[product.ISIN][0].value - position.value, 2)
-
         self.map[product.ISIN] = (position, signal)
 
+        return True
+
     def update_position(self, product : Product, position : Position):
-        self.update(product, position, self.signal(product))
+        return self.update(product, position, self.signal(product))
 
     def update_signal(self, product : Product, signal : Signal):
-        self.update(product, self.position(product), signal)
+        return self.update(product, self.position(product), signal)
+
+    def enough_cash(self, position : Position):
+        return position.value > self.cash
 
     def positions(self, position_type):
         return [isin for isin in self.map.keys() if self.map[isin][0].type() == position_type]

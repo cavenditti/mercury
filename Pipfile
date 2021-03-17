@@ -9,6 +9,7 @@ ta-lib = "*"
 scikit-learn = "*"
 statsmodels = "*"
 matplotlib = "*"
+pympler = "*"
 
 [dev-packages]
 

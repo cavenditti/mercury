@@ -1,4 +1,4 @@
-# We're using annotations in a class with functions returning
+# ke're using annotations in a class with functions returning
 # an instance of the class inside the class.
 # This will become the default behaviour starting from Python 3.10
 from __future__ import annotations
