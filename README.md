@@ -1,4 +1,4 @@
-# Mercury backtesting suite
+# [VERY WIP] Mercury backtesting suite
 
 This is a stub of a very simple backtesting framework in Python.
 It is conceived to make life easyier when writing strategies, as such its performance is totally crap right now and it's probably not working as intended yet.
